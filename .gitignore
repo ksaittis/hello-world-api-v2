@@ -1,0 +1,5 @@
+**/.env
+.idea/
+
+python/build_dist/
+python/egg_info/
