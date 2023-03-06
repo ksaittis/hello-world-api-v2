@@ -8,11 +8,18 @@ from .models import User
 
 class UserStorage(ABC):
     @abstractmethod
-    def put_user(self, user: User):
+    def put_user(self, user: User) -> None:
+        """Stores a user from storage"""
         ...
 
     @abstractmethod
-    def get_user(self, username: str):
+    def get_user(self, username: str) -> User:
+        """Retrieves a user from storage"""
+        ...
+
+    @abstractmethod
+    def _setup_storage(self):
+        """Setting up storage"""
         ...
 
 
@@ -23,14 +30,15 @@ class DynamoDBStorage(UserStorage):
             region_name=os.getenv("AWS_REGION", 'eu-west-1'),
             endpoint_url=os.getenv('DYNAMODB_ENDPOINT', 'dynamodb.eu-west-1.amazonaws.com')
         )
+        self.table_name = table_name
         self.table = self.dynamodb.Table(table_name)
-        self._setup_table(table_name)
+        self._setup_storage()
 
-    def _setup_table(self, table_name: str) -> None:
+    def _setup_storage(self) -> None:
         try:
             self.table.load()
         except self.dynamodb.meta.client.exceptions.ResourceNotFoundException:
-            self._create_table(table_name)
+            self._create_table(self.table_name)
 
     def _create_table(self, table_name: str):
         self.table = self.dynamodb.create_table(
