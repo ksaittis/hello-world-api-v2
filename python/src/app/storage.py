@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import boto3
 import os
@@ -13,12 +14,12 @@ class UserStorage(ABC):
         ...
 
     @abstractmethod
-    def get_user(self, username: str) -> User:
+    def get_user(self, username: str) -> Optional[User]:
         """Retrieves a user from storage"""
         ...
 
     @abstractmethod
-    def _setup_storage(self):
+    def _setup_storage(self) -> None:
         """Setting up storage"""
         ...
 
@@ -62,13 +63,13 @@ class DynamoDBStorage(UserStorage):
         )
         self.table.wait_until_exists()
 
-    def put_user(self, user: User):
+    def put_user(self, user: User) -> None:
         item = {
             'username': user.username,
             'dateOfBirth': str(user.dateOfBirth),
         }
         self.table.put_item(Item=item)
 
-    def get_user(self, username: str):
+    def get_user(self, username: str) -> Optional[User]:
         response = self.table.get_item(Key={'username': username})
         return response.get('Item')

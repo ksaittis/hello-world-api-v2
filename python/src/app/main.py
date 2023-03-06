@@ -1,17 +1,22 @@
 from datetime import date
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from starlette import status
 
 from .models import User
 from .storage import UserStorage, DynamoDBStorage
 
 app = FastAPI()
-storage: UserStorage = DynamoDBStorage(table_name='users')
+
+
+def get_storage():
+    # Here we can inject different UserStorages
+    storage: UserStorage = DynamoDBStorage(table_name='users')
+    return storage
 
 
 @app.put("/hello/{username}", status_code=status.HTTP_204_NO_CONTENT)
-def create_user(user: User):
+def create_user(user: User, storage: UserStorage = Depends(get_storage)):
     try:
         storage.put_user(user)
     except Exception as e:
@@ -20,7 +25,7 @@ def create_user(user: User):
 
 
 @app.get("/hello/{username}")
-def greet_user(username: str):
+def greet_user(username: str, storage: UserStorage = Depends(get_storage)):
     user = storage.get_user(username)
 
     if user is None:
