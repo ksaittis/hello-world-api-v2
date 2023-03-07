@@ -24,6 +24,13 @@ def create_user(user: User, storage: UserStorage = Depends(get_storage)):
     return None
 
 
+def get_greeting_message(username: str, days_to_birthday: int) -> str:
+    if days_to_birthday == 0:
+        return f"Hello, {username}! Happy birthday!"
+    else:
+        return f"Hello, {username}! Your birthday is in {days_to_birthday} day(s)"
+
+
 @app.get("/hello/{username}")
 def greet_user(username: str, storage: UserStorage = Depends(get_storage)):
     user = storage.get_user(username)
@@ -31,14 +38,7 @@ def greet_user(username: str, storage: UserStorage = Depends(get_storage)):
     if user is None:
         message = f"Hello, {username}!"
     else:
-        dob = date.fromisoformat(user['dateOfBirth'])
-        today = date.today()
-        next_birthday = date(today.year, dob.month, dob.day)
-        if next_birthday < today:
-            next_birthday = date(today.year + 1, dob.month, dob.day)
-        days_to_birthday = (next_birthday - today).days
-        if days_to_birthday == 0:
-            message = f"Hello, {username}! Happy birthday!"
-        else:
-            message = f"Hello, {username}! Your birthday is in {days_to_birthday} day(s)"
+        days_to_birthday = user.get_days_until_birthday()
+        message = get_greeting_message(username, days_to_birthday)
+
     return {'message': message}
