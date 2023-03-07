@@ -14,6 +14,9 @@ setup(
         'pydantic',
         'boto3',
     ],
+    extras_require={
+        'tests': ['pytest>=3.7.0', 'freezegun'],
+    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3.8',
