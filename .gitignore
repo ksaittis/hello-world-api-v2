@@ -2,4 +2,6 @@
 .idea/
 
 python/build_dist/
-python/egg_info/
+**/*egg_info/
+
+**/__pycache__/
