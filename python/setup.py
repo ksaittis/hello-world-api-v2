@@ -10,12 +10,12 @@ setup(
     package_dir={'': 'src'},
     install_requires=[
         'fastapi',
-        'uvicorn[standard]',
-        'pydantic',
-        'boto3',
+        'uvicorn[standard]>=0.20.0',
+        'pydantic>=1.10.6',
+        'boto3>=1.26.87',
     ],
     extras_require={
-        'tests': ['pytest>=3.7.0', 'freezegun'],
+        'tests': ['pytest>=3.7.0', 'freezegun>=1.2.2', 'moto[dynamodb]>=4.1.4'],
     },
     classifiers=[
         'Development Status :: 3 - Alpha',

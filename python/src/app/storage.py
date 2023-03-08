@@ -24,12 +24,11 @@ class UserStorage(ABC):
         ...
 
 
-class DynamoDBStorage(UserStorage):
+class DynamoDBUserStorage(UserStorage):
     def __init__(self, table_name: str):
         self.dynamodb = boto3.resource(
             'dynamodb',
             region_name=os.getenv("AWS_REGION", 'eu-west-1'),
-            endpoint_url=os.getenv('DYNAMODB_ENDPOINT', 'dynamodb.eu-west-1.amazonaws.com')
         )
         self.table_name = table_name
         self.table = self.dynamodb.Table(table_name)
@@ -66,10 +65,10 @@ class DynamoDBStorage(UserStorage):
     def put_user(self, user: User) -> None:
         item = {
             'username': user.username,
-            'dateOfBirth': str(user.dateOfBirth),
+            'dateOfBirth': user.dateOfBirth.get_date(),
         }
         self.table.put_item(Item=item)
 
     def get_user(self, username: str) -> Optional[User]:
         response = self.table.get_item(Key={'username': username})
-        return response.get('Item')
+        return User.from_response(response.get('Item'))

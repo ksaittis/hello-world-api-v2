@@ -1,17 +1,15 @@
-from datetime import date
-
 from fastapi import FastAPI, HTTPException, Depends
 from starlette import status
 
 from .models import User
-from .storage import UserStorage, DynamoDBStorage
+from .storage import UserStorage, DynamoDBUserStorage
 
 app = FastAPI()
 
 
 def get_storage():
     # Here we can inject different UserStorages
-    storage: UserStorage = DynamoDBStorage(table_name='users')
+    storage: UserStorage = DynamoDBUserStorage(table_name='users')
     return storage
 
 
@@ -38,7 +36,7 @@ def greet_user(username: str, storage: UserStorage = Depends(get_storage)):
     if user is None:
         message = f"Hello, {username}!"
     else:
-        days_to_birthday = user.get_days_until_birthday()
+        days_to_birthday = user.dateOfBirth.get_days_until_birthday()
         message = get_greeting_message(username, days_to_birthday)
 
     return {'message': message}

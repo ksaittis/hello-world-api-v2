@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import date, datetime
 
 from pydantic import BaseModel, validator, Field
@@ -6,6 +7,9 @@ from pydantic import BaseModel, validator, Field
 class Birthday(BaseModel):
     format: str = Field(default="%Y-%m-%d")
     value: date
+
+    def get_date(self) -> str:
+        return self.value.strftime(self.format)
 
     @validator('value')
     def date_must_be_in_past(cls, value, values):
@@ -36,13 +40,16 @@ class User(BaseModel):
     dateOfBirth: Birthday
 
     @validator('username')
-    def username_must_contain_only_letters(cls, v):
-        assert v.isalpha(), 'username must contain only letters'
-        return v
+    def username_must_contain_only_letters(cls, username):
+        assert username.isalpha(), 'username must contain only letters'
+        return username
+
+    @classmethod
+    def from_response(cls, response_item) -> User:
+        return User(
+            username=response_item['username'],
+            dateOfBirth=Birthday(value=response_item['dateOfBirth'])
+        )
 
     class Config:
         allow_mutation = False
-
-
-class HelloResponse(BaseModel):
-    message: str
