@@ -14,4 +14,4 @@ RUN python setup.py install
 EXPOSE 80
 
 # Define the command to run the application when the container starts
-CMD ["uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "5000"]
